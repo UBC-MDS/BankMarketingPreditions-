@@ -1,2 +1,7 @@
-# Group37DSCI522
-This is the project repo for DSCI 522 Data Science Workflows
+# PROJECT TITLE
+Authors: Hala Arar, Fazeeia Mohammad, Rong Wan 
+
+SUMMARY OF PROJECT
+HOW TO RUN DATA ANALYSIS
+LIST OF DEPENDENCIES
+NAMES OF THE LICENSES 
