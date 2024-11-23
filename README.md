@@ -29,7 +29,7 @@ After activating the environment, you can run the analysis script or Jupyter not
 
 The final report is available as a PDF. You can view the completed analysis by opening the bank_marketing_analysis.pdf file.
 
-## DEPENDENCIES
+## Dependencies
 
 To run the analysis and work with the code, you will need to install the following Python packages. These are automatically included in the environment.yml file, but here is the full list for reference:
 
@@ -45,7 +45,7 @@ altair_ally
 These dependencies are necessary for data processing, model building, evaluation, and visualization.
 
 
-## LICENSE
+## License
 
 This project is licensed under CC0 1.0 Universal (Creative Commons Public Domain Dedication). By applying this license, the creator voluntarily waives all copyright and related rights, allowing anyone to use, modify, distribute, or build upon the work for any purpose, including commercial purposes, without the need for permission or attribution. 
 
