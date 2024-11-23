@@ -1,1 +1,18 @@
-blah
+name: bankenv  
+channels:
+  - conda-forge  
+  - defaults  
+dependencies:
+  - python=3.9  
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - pip  
+  - pip:
+    - ucimlrepo
+    - altair-ally
+    - vegafusion
+    - vegafusion-python-embed
+    - vl-convert-python>=1.6.0
