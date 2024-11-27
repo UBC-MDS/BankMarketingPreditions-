@@ -16,3 +16,4 @@ dependencies:
     - vegafusion
     - vegafusion-python-embed
     - vl-convert-python>=1.6.0
+    - pandera
