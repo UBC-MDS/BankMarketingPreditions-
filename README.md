@@ -11,6 +11,30 @@ The project explores several machine learning models, including Logistic Regress
 
 ## How to Run the Analysis
 
+### Option 1: Run Using Docker
+
+1. **Install Docker**
+
+Download and install Docker Desktop for your operating system and ensure it is running.
+
+2. **Pull the Docker Image**
+
+Run the following command in your terminal to pull the project’s Docker image:
+
+docker pull fazeeia/dsci522-dockerfile-bank:latest
+
+3. **Run the Docker Container**
+
+Run the following command in your terminal to start the container:
+
+docker run -p 8888:8888 -it fazeeia/dsci522-dockerfile-bank:latest
+
+4. **Access JupyterLab**
+
+You will see a URL in the terminal. Open the link in your browser to access the JupyterLab environment. 
+
+### Option 2: Run Locally
+
 1. **Clone the repository**
 
 git clone https://github.com/mindy001/Group37DSCI522.git
