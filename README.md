@@ -17,19 +17,33 @@ The project explores several machine learning models, including Logistic Regress
 
 Download and install Docker Desktop for your operating system and ensure it is running.
 
-2. **Pull the Docker Image**
+2. **Clone the repository**
+
+Open your terminal and run the following command to clone the project repository to your local machine:
+
+git clone https://github.com/mindy001/BankMarketingPreditions-.git
+
+Navigate to the project directory
+
+cd BankMarketingPreditions-
+
+
+3. **Pull the Docker Image**
 
 Run the following command in your terminal to pull the project’s Docker image:
 
 docker pull fazeeia/dsci522-dockerfile-bank:latest
 
-3. **Run the Docker Container**
+4. **Run the Docker Container**
 
-Run the following command in your terminal to start the container:
+Run the following command in your terminal to start the Docker container and mount your local directory:
 
-docker run -p 8888:8888 -it fazeeia/dsci522-dockerfile-bank:latest
+docker run -p 8888:8888 -it -v /$(pwd):/home/jovyan/work fazeeia/dsci522-d
 
-4. **Access JupyterLab**
+-p 8888:8888: This maps port 8888 inside the container to port 8888 on your local machine (where JupyterLab will be running).
+-v $(pwd):/home/jovyan/work: This mounts your current working directory to the container’s working directory, allowing you to access your project files inside the container.
+
+5. **Access JupyterLab**
 
 You will see a URL in the terminal. Open the link in your browser to access the JupyterLab environment. 
 
@@ -43,7 +57,6 @@ git clone https://github.com/mindy001/Group37DSCI522.git
 
 conda env create -f env/environment.yml
 conda activate bankenv
-
 
 3. **Run the Analysis**
 
