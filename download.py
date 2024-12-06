@@ -32,7 +32,7 @@ def read_csv(directory, filename):
         raise Exception(f"An error occurred while reading the CSV file: {e}")
 
 @click.command()
-@click.option('--directory', type=str, default=r'C:\Users\fazee\OneDrive\Desktop\Masters Of Data Science\Group37DSCI522\data', help="Directory where the CSV file is located.")
+@click.option('--directory', type=str, default='data/bankmarketing/bank-additional/bank-additional/', help="Directory where the CSV file is located.")
 @click.option('--filename', type=str, default='bank-additional-full.csv', help="Name of the CSV file.")
 def main(directory, filename):
     """Reads a CSV file from a specified directory and prints its contents."""
