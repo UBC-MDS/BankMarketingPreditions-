@@ -22,7 +22,6 @@ def preprocess_data(input_path, output_path):
         # Step 2: Clean and fix column names
         print("Current column names:", bank_data.columns.tolist())
         bank_data.columns = bank_data.columns.str.strip().str.replace('"', "")
-
         expected_columns = ['age', 'job', 'marital', 'education', 'default', 'housing', 'loan', 
                             'contact', 'month', 'day_of_week', 'duration', 'campaign', 'pdays', 
                             'previous', 'poutcome', 'emp.var.rate', 'cons.price.idx', 
