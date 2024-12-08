@@ -3,7 +3,7 @@ title: "Bank Marketing Analysis"
 author: "Rong Wan, Hala Arar & Fazeeia Mohammed"
 date: "2024/11/21"
 format:
-  html:
+  pdf:
     toc: true
     toc-depth: 3
     toc-title: Contents
@@ -35,6 +35,8 @@ from pandera import Column, DataFrameSchema
 from scipy.stats import pointbiserialr, chi2_contingency
 from pandera import Column, DataFrameSchema, Check
 from pandera.errors import SchemaErrors
+import pandas as pd
+from IPython.display import Markdown
 ```
 
 # Summary
@@ -63,7 +65,7 @@ The dataset used in this project is the Bank Marketing dataset, sourced from the
 #| results: hide
 
 #download and extract data from csv
-bank_data = pd.read_csv("data/bankmarketing/bank-additional/bank-additional/bank-additional-full.csv", sep = ";")
+bank_data = pd.read_csv("../data/bank-additional-full.csv", sep = ";")
 bank_data
 
 # Check if 'unknown' is still present in any column
@@ -1070,7 +1072,7 @@ feature_names = numeric_feats + list(ohe_columns)
 
 
     
-![Confusion Matrix Heat Map](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){@fig-confusion}
+![Confusion Matrix Heat Map](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){#fig-confusion}
     
 
 
@@ -1101,7 +1103,7 @@ plt.show()
 
 
     
-![Optimized Decision Tree Visualization](bank_marketing_analysis_files/bank_marketing_analysis_33_0.png){@fig-decision-tree}
+![Optimized Decision Tree Visualization](bank_marketing_analysis_files/bank_marketing_analysis_33_0.png){#fig-decision-tree}
     
 
 
