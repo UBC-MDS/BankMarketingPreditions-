@@ -8,6 +8,10 @@ This project aims to enhance bank marketing campaigns by using machine learning 
 
 The project explores several machine learning models, including Logistic Regression and Decision Trees. These models are trained on customer data, with preprocessing techniques like feature scaling and one-hot encoding applied to prepare the data for analysis. The outcome of this work demonstrates how banks can leverage machine learning to implement more effective, data-driven marketing strategies, which can lead to better customer acquisition and optimized campaign performance.
 
+The Logistic Regression model achieved an accuracy of 88.5%, with a focus on minimizing false positives, resulting in a precision of 0.70 and recall of 0.20. Despite its high precision, the model's low recall indicates that it misses a significant portion of actual subscribers. The Decision Tree model, with an accuracy of 89.7%, demonstrated better recall (0.23) but at the cost of increased false positives (126). Both models highlight the class imbalance in the dataset, where non-subscribers are far more prevalent than subscribers. The Logistic Regression model is more suitable when minimizing false positives is prioritized, whereas the Decision Tree model is more effective in identifying potential subscribers but may require further regularization to reduce overfitting. 
+
+Strategic recommendations for targeted marketing, personalized offers, and campaign timing are proposed to optimize resource allocation and improve conversion rates. Future model iterations should focus on improving both precision and recall to enhance marketing efforts and increase return on investment.
+
 
 ## How to Run the Analysis
 

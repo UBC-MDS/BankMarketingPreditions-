@@ -1,9 +1,9 @@
 name: bankenv
 channels:
   - conda-forge
-  - default
+  - defaults
 dependencies:
-  - python=3.11  
+  - python=3.11
   - matplotlib=3.9.2
   - numpy=1.26.0
   - pandas=2.2.2
@@ -13,5 +13,6 @@ dependencies:
   - pip=24.0
   - pandera=0.9.0
   - scipy=1.11.2
+  - ipython=8.12.0  
   - pip:
-    - altair-ally
+    - altair-ally 
