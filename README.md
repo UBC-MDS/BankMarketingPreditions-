@@ -12,6 +12,8 @@ The Logistic Regression model achieved an accuracy of 88.5%, with a focus on min
 
 Strategic recommendations for targeted marketing, personalized offers, and campaign timing are proposed to optimize resource allocation and improve conversion rates. Future model iterations should focus on improving both precision and recall to enhance marketing efforts and increase return on investment.
 
+## Report
+The final report can be found [here](https://github.com/mindy001/BankMarketingPreditions-/blob/main/reports/bank_marketing_analysis.pdf).
 
 ## How to Run the Analysis
 
@@ -51,6 +53,7 @@ docker run -p 8888:8888 -it -v /$(pwd):/home/jovyan/work fazeeia/dsci522-d
 
 You will see a URL in the terminal. Open the link in your browser to access the JupyterLab environment. 
 
+
 ### Option 2: Run Locally
 
 1. **Clone the repository**
@@ -69,8 +72,21 @@ After activating the environment, you can run the analysis script or Jupyter not
 4. **Open the Report**
 
 The final report is available as a PDF. You can view the completed analysis by opening the bank_marketing_analysis.pdf file.
+## Running Project scripts
+1. Change your directory to the current project directory using the cd command from bash.
+2. Scripts are run using the click command in the root of the project. More details about the scripts can be found in the scr directory.
+3. These are command lines to run  the python files:
+        python 01_download.py --directory data/bankmarketing/bank-additional/bank-additional/ --filename bank-additional-full.csv
+        python 02_clean_data.py --input_path data/bankmarketing/bank-additional/bank-additional/bank-additional-full.csv --output_path data/cleaned_bank_data.csv
+        python 03_explory_analysis.py --cleaned_data_path data/cleaned_bank_data.csv --output_prefix results/eda
+        python 04_model_LR.py --input_path ./cleaned_data.csv --model_output_path ./model/logistic_regression_model.pkl --confusion_matrix_output .results/eda/confusion_matrixLR.png
+        python 04_model_DT.py --input_path ./cleaned_data.csv --model_output_path ./model/decision_tree_model.pkl --confusion_matrix_output .results/eda/confusion_matrixDT.png
+
+       
 
 ## Dependencies
+
+Docker is a container solution used to manage the software dependencies for this project. The Docker image used for this project is based on the quay.io/jupyter/minimal-notebook:notebook-7.0.6 image. Additional dependencies are specified in the Dockerfile.
 
 To run the analysis and work with the code, you will need to install the following Python packages. These are automatically included in the environment.yml file, but here is the full list for reference:
 
@@ -82,6 +98,7 @@ matplotlib
 seaborn
 ucimlrepo
 altair_ally
+click 
 
 These dependencies are necessary for data processing, model building, evaluation, and visualization.
 
