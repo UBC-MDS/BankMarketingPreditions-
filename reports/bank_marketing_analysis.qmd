@@ -13,6 +13,7 @@ bibliography: references.bib
 
 ```{python}
 #| echo: false  
+#| results: hide
 
 import altair as alt
 import numpy as np
@@ -35,8 +36,19 @@ from pandera import Column, DataFrameSchema
 from scipy.stats import pointbiserialr, chi2_contingency
 from pandera import Column, DataFrameSchema, Check
 from pandera.errors import SchemaErrors
-import pandas as pd
 from IPython.display import Markdown
+from IPython.display import display, HTML
+
+# Adjust the CSS for output display
+display(HTML("""
+<style>
+.output_area pre {
+    white-space: pre-wrap; /* Enable word wrapping for long lines */
+    word-wrap: break-word; /* Ensure lines break properly */
+}
+</style>
+"""))
+
 ```
 
 # Summary
@@ -70,46 +82,9 @@ bank_data
 
 # Check if 'unknown' is still present in any column
 unknown_counts = bank_data.isin(['unknown']).sum()
-print("Unknown counts in each column:\n", unknown_counts)
 
-# Plot
-plt.figure(figsize=(8,6))
-sns.countplot(data=bank_data, x='education', hue='loan')
-plt.title('Education Level vs Loan Status')
-plt.xticks(rotation=45)
-plt.show()
 ```
 
-    Unknown counts in each column:
-     age                  0
-    job                330
-    marital             80
-    education         1731
-    default           8597
-    housing            990
-    loan               990
-    contact              0
-    month                0
-    day_of_week          0
-    duration             0
-    campaign             0
-    pdays                0
-    previous             0
-    poutcome             0
-    emp.var.rate         0
-    cons.price.idx       0
-    cons.conf.idx        0
-    euribor3m            0
-    nr.employed          0
-    y                    0
-    dtype: int64
-    
-
-
-    
-![Loan Status distribution across education levels](bank_marketing_analysis_files/bank_marketing_analysis_10_1.png){#fig-education}
-
-    
 ```{python}
 #| echo: false   
 
@@ -118,10 +93,15 @@ plt.show()
 #| layout-ncol: 1
 
 data_info_table = pd.read_csv("../results/data_info.csv")
-display(Markdown(data_info_table.to_markdown(index=False)))
 
+data_info_table = data_info_table.apply(lambda col: col.apply(lambda x: str(x)[:50] + '...' if isinstance(x, str) else x))
+
+display(Markdown(data_info_table.to_markdown(index=False)))
 ```
 
+![Loan Status distribution across education levels](bank_marketing_analysis_files/bank_marketing_analysis_10_1.png){#fig-education}
+
+\newpage
 
 ## Data Validation Check
 
@@ -201,10 +181,6 @@ else:
     print("Data validation passed!")
 ```
 
-    Data validation failed with the following errors:
-    - Dataset contains duplicate rows.
-    
-
 
 ```{python}
 #| echo: false   
@@ -235,10 +211,6 @@ except pa.errors.SchemaError as e:
     print("Outlier validation failed:")
     print(e)
 ```
-
-    Data passed outlier validation checks.
-    
-
 
 ```{python}
 
@@ -291,9 +263,6 @@ except pa.errors.SchemaError as e:
     print(e)
 ```
 
-    Data passed category level validation checks.
-    
-
 
 ```{python}
 
@@ -313,9 +282,6 @@ except pa.errors.SchemaError as e:
 
 ```
 
-    Target validation passed.
-    
-
 
 ```{python}
 
@@ -326,39 +292,13 @@ target_column = 'y'
 # Calculate the value counts for the target variable
 target_counts = bank_data[target_column].value_counts()
 
-# Print out the distribution
-print(f"Distribution of '{target_column}':")
-print(target_counts)
-
-# Plot the distribution for visual inspection
-plt.figure(figsize=(6, 4))
-target_counts.plot(kind='bar', color=['skyblue', 'lightcoral'])
-plt.title(f"Distribution of '{target_column}'")
-plt.xlabel(target_column)
-plt.ylabel('Count')
-plt.xticks(rotation=0)
-plt.show()
-
 
 ```
-
-    Distribution of 'y':
-    y
-    no     36548
-    yes     4640
-    Name: count, dtype: int64
-    
-
-
-    
-![Distribution of Y](bank_marketing_analysis_files/bank_marketing_analysis_17_1.png){#fig-distributionY}
-    
 
 ```{python}
 
 #| echo: false   
 # No Anomalous Correlations Between Target/Response Variable and Features
-
 def check_correlations_with_target(data):
     # Convert categorical variables to numerical for correlation analysis
     data_encoded = data.copy()
@@ -366,50 +306,27 @@ def check_correlations_with_target(data):
         data_encoded[column] = data_encoded[column].astype('category').cat.codes
     
     correlation_with_target = data_encoded.corr()['y'].drop('y')
-    print("Correlations with target variable:\n", correlation_with_target)
     
     # Check for high correlations (greater than 0.9 or less than -0.9)
     anomalous_correlations = correlation_with_target[abs(correlation_with_target) > 0.9]
     if not anomalous_correlations.empty:
-        print(f"Warning: Anomalous correlations between target and features: {anomalous_correlations}")
-    
+        return f"Warning: Anomalous correlations detected between target and features: {anomalous_correlations.index.tolist()}"
+    return "No anomalous correlations detected between target and features."
+
 try:
-    check_correlations_with_target(bank_data)
+    result = check_correlations_with_target(bank_data)
+    print(result)
 except Exception as e:
     print("Error in correlation with target check:", e)
 
 ```
 
-    Correlations with target variable:
-     age               0.030399
-    job               0.025122
-    marital           0.046203
-    education         0.057799
-    default          -0.099352
-    housing           0.011552
-    loan             -0.004909
-    contact          -0.144773
-    month            -0.006065
-    day_of_week       0.015967
-    duration          0.405274
-    campaign         -0.066357
-    pdays            -0.324914
-    previous          0.230181
-    poutcome          0.129789
-    emp.var.rate     -0.298334
-    cons.price.idx   -0.136211
-    cons.conf.idx     0.054878
-    euribor3m        -0.307771
-    nr.employed      -0.354678
-    Name: y, dtype: float64
-    
 
 
 ```{python}
 
 #| echo: false   
 # No Anomalous Correlations Between Features
-
 def check_feature_correlations(data):
     # Convert categorical variables to numerical for correlation analysis
     data_encoded = data.copy()
@@ -424,206 +341,22 @@ def check_feature_correlations(data):
     high_correlation = high_correlation[(high_correlation != 1).any(axis=1)]  # Remove self-correlations
     
     if not high_correlation.empty:
-        print(f"Warning: Anomalous correlations between features:\n{high_correlation}")
-    
+        return f"Warning: Anomalous correlations detected between features: {high_correlation.index.tolist()}"
+    return "No anomalous correlations detected between features."
+
 try:
-    check_feature_correlations(bank_data)
+    result = check_feature_correlations(bank_data)
+    print(result)
 except Exception as e:
     print("Error in feature correlation check:", e)
 
+
 ```
 
-    Feature correlation matrix:
-                          age       job   marital  education   default   housing  \
-    age             1.000000  0.001250 -0.389753  -0.117892  0.164965 -0.001603   
-    job             0.001250  1.000000  0.027897   0.134121 -0.028277  0.006962   
-    marital        -0.389753  0.027897  1.000000   0.109220 -0.079450  0.010467   
-    education      -0.117892  0.134121  0.109220   1.000000 -0.186859  0.016825   
-    default         0.164965 -0.028277 -0.079450  -0.186859  1.000000 -0.015815   
-    housing        -0.001603  0.006962  0.010467   0.016825 -0.015815  1.000000   
-    loan           -0.007368 -0.010209  0.005788   0.006384 -0.003782  0.044296   
-    contact         0.007021 -0.025132 -0.054501  -0.105726  0.135238 -0.082186   
-    month          -0.024877 -0.033213 -0.007629  -0.082684 -0.015830 -0.018141   
-    day_of_week    -0.017572 -0.000844  0.002202  -0.017986 -0.008701  0.003339   
-    duration       -0.000866 -0.006490  0.010290  -0.015102 -0.011794 -0.007658   
-    campaign        0.004594 -0.006923 -0.007240   0.000371  0.032825 -0.011010   
-    pdays          -0.034369 -0.028468 -0.037942  -0.046626  0.080062 -0.010551   
-    previous        0.024365  0.020965  0.038689   0.038831 -0.102416  0.021314   
-    poutcome        0.019750  0.011504  0.001912   0.017009  0.023417 -0.011783   
-    emp.var.rate   -0.000371 -0.008271 -0.084210  -0.043778  0.203263 -0.060196   
-    cons.price.idx  0.000857 -0.016017 -0.057477  -0.081607  0.168073 -0.080504   
-    cons.conf.idx   0.129372  0.052760 -0.033783   0.078799  0.026522 -0.033845   
-    euribor3m       0.010767 -0.007880 -0.091939  -0.036380  0.195336 -0.059277   
-    nr.employed    -0.017725 -0.019574 -0.086199  -0.041492  0.189845 -0.045862   
-    y               0.030399  0.025122  0.046203   0.057799 -0.099352  0.011552   
-    
-                        loan   contact     month  day_of_week  ...  campaign  \
-    age            -0.007368  0.007021 -0.024877    -0.017572  ...  0.004594   
-    job            -0.010209 -0.025132 -0.033213    -0.000844  ... -0.006923   
-    marital         0.005788 -0.054501 -0.007629     0.002202  ... -0.007240   
-    education       0.006384 -0.105726 -0.082684    -0.017986  ...  0.000371   
-    default        -0.003782  0.135238 -0.015830    -0.008701  ...  0.032825   
-    housing         0.044296 -0.082186 -0.018141     0.003339  ... -0.011010   
-    loan            1.000000 -0.008556 -0.005705    -0.009344  ...  0.005166   
-    contact        -0.008556  1.000000  0.276565    -0.009575  ...  0.077368   
-    month          -0.005705  0.276565  1.000000     0.027677  ... -0.062059   
-    day_of_week    -0.009344 -0.009575  0.027677     1.000000  ... -0.038288   
-    duration       -0.000916 -0.026657  0.003690     0.021950  ... -0.071699   
-    campaign        0.005166  0.077368 -0.062059    -0.038288  ...  1.000000   
-    pdays           0.000345  0.117970 -0.047891    -0.009531  ...  0.052584   
-    previous       -0.001327 -0.212848  0.103157    -0.004102  ... -0.079141   
-    poutcome       -0.001511  0.118744 -0.065012     0.018732  ...  0.032586   
-    emp.var.rate    0.001849  0.393584 -0.178782     0.033245  ...  0.150754   
-    cons.price.idx -0.002430  0.591474 -0.004239     0.005644  ...  0.127836   
-    cons.conf.idx  -0.012025  0.251614  0.009652     0.041465  ... -0.013733   
-    euribor3m       0.000125  0.399773 -0.117264     0.039043  ...  0.135133   
-    nr.employed     0.003903  0.269155 -0.221425     0.028380  ...  0.144095   
-    y              -0.004909 -0.144773 -0.006065     0.015967  ... -0.066357   
-    
-                       pdays  previous  poutcome  emp.var.rate  cons.price.idx  \
-    age            -0.034369  0.024365  0.019750     -0.000371        0.000857   
-    job            -0.028468  0.020965  0.011504     -0.008271       -0.016017   
-    marital        -0.037942  0.038689  0.001912     -0.084210       -0.057477   
-    education      -0.046626  0.038831  0.017009     -0.043778       -0.081607   
-    default         0.080062 -0.102416  0.023417      0.203263        0.168073   
-    housing        -0.010551  0.021314 -0.011783     -0.060196       -0.080504   
-    loan            0.000345 -0.001327 -0.001511      0.001849       -0.002430   
-    contact         0.117970 -0.212848  0.118744      0.393584        0.591474   
-    month          -0.047891  0.103157 -0.065012     -0.178782       -0.004239   
-    day_of_week    -0.009531 -0.004102  0.018732      0.033245        0.005644   
-    duration       -0.047577  0.020640  0.033360     -0.027968        0.005312   
-    campaign        0.052584 -0.079141  0.032586      0.150754        0.127836   
-    pdays           1.000000 -0.587514 -0.475619      0.271004        0.078889   
-    previous       -0.587514  1.000000 -0.313110     -0.420489       -0.203130   
-    poutcome       -0.475619 -0.313110  1.000000      0.192972        0.211330   
-    emp.var.rate    0.271004 -0.420489  0.192972      1.000000        0.775334   
-    cons.price.idx  0.078889 -0.203130  0.211330      0.775334        1.000000   
-    cons.conf.idx  -0.091342 -0.050936  0.178289      0.196041        0.058986   
-    euribor3m       0.296899 -0.454494  0.184144      0.972245        0.688230   
-    nr.employed     0.372605 -0.501333  0.119689      0.906970        0.522034   
-    y              -0.324914  0.230181  0.129789     -0.298334       -0.136211   
-    
-                    cons.conf.idx  euribor3m  nr.employed         y  
-    age                  0.129372   0.010767    -0.017725  0.030399  
-    job                  0.052760  -0.007880    -0.019574  0.025122  
-    marital             -0.033783  -0.091939    -0.086199  0.046203  
-    education            0.078799  -0.036380    -0.041492  0.057799  
-    default              0.026522   0.195336     0.189845 -0.099352  
-    housing             -0.033845  -0.059277    -0.045862  0.011552  
-    loan                -0.012025   0.000125     0.003903 -0.004909  
-    contact              0.251614   0.399773     0.269155 -0.144773  
-    month                0.009652  -0.117264    -0.221425 -0.006065  
-    day_of_week          0.041465   0.039043     0.028380  0.015967  
-    duration            -0.008173  -0.032897    -0.044703  0.405274  
-    campaign            -0.013733   0.135133     0.144095 -0.066357  
-    pdays               -0.091342   0.296899     0.372605 -0.324914  
-    previous            -0.050936  -0.454494    -0.501333  0.230181  
-    poutcome             0.178289   0.184144     0.119689  0.129789  
-    emp.var.rate         0.196041   0.972245     0.906970 -0.298334  
-    cons.price.idx       0.058986   0.688230     0.522034 -0.136211  
-    cons.conf.idx        1.000000   0.277686     0.100513  0.054878  
-    euribor3m            0.277686   1.000000     0.945154 -0.307771  
-    nr.employed          0.100513   0.945154     1.000000 -0.354678  
-    y                    0.054878  -0.307771    -0.354678  1.000000  
-    
-    [21 rows x 21 columns]
-    Warning: Anomalous correlations between features:
-                    age  job  marital  education  default  housing  loan  contact  \
-    age             1.0  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    job             NaN  1.0      NaN        NaN      NaN      NaN   NaN      NaN   
-    marital         NaN  NaN      1.0        NaN      NaN      NaN   NaN      NaN   
-    education       NaN  NaN      NaN        1.0      NaN      NaN   NaN      NaN   
-    default         NaN  NaN      NaN        NaN      1.0      NaN   NaN      NaN   
-    housing         NaN  NaN      NaN        NaN      NaN      1.0   NaN      NaN   
-    loan            NaN  NaN      NaN        NaN      NaN      NaN   1.0      NaN   
-    contact         NaN  NaN      NaN        NaN      NaN      NaN   NaN      1.0   
-    month           NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    day_of_week     NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    duration        NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    campaign        NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    pdays           NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    previous        NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    poutcome        NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    emp.var.rate    NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    cons.price.idx  NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    cons.conf.idx   NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    euribor3m       NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    nr.employed     NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    y               NaN  NaN      NaN        NaN      NaN      NaN   NaN      NaN   
-    
-                    month  day_of_week  ...  campaign  pdays  previous  poutcome  \
-    age               NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    job               NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    marital           NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    education         NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    default           NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    housing           NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    loan              NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    contact           NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    month             1.0          NaN  ...       NaN    NaN       NaN       NaN   
-    day_of_week       NaN          1.0  ...       NaN    NaN       NaN       NaN   
-    duration          NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    campaign          NaN          NaN  ...       1.0    NaN       NaN       NaN   
-    pdays             NaN          NaN  ...       NaN    1.0       NaN       NaN   
-    previous          NaN          NaN  ...       NaN    NaN       1.0       NaN   
-    poutcome          NaN          NaN  ...       NaN    NaN       NaN       1.0   
-    emp.var.rate      NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    cons.price.idx    NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    cons.conf.idx     NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    euribor3m         NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    nr.employed       NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    y                 NaN          NaN  ...       NaN    NaN       NaN       NaN   
-    
-                    emp.var.rate  cons.price.idx  cons.conf.idx  euribor3m  \
-    age                      NaN             NaN            NaN        NaN   
-    job                      NaN             NaN            NaN        NaN   
-    marital                  NaN             NaN            NaN        NaN   
-    education                NaN             NaN            NaN        NaN   
-    default                  NaN             NaN            NaN        NaN   
-    housing                  NaN             NaN            NaN        NaN   
-    loan                     NaN             NaN            NaN        NaN   
-    contact                  NaN             NaN            NaN        NaN   
-    month                    NaN             NaN            NaN        NaN   
-    day_of_week              NaN             NaN            NaN        NaN   
-    duration                 NaN             NaN            NaN        NaN   
-    campaign                 NaN             NaN            NaN        NaN   
-    pdays                    NaN             NaN            NaN        NaN   
-    previous                 NaN             NaN            NaN        NaN   
-    poutcome                 NaN             NaN            NaN        NaN   
-    emp.var.rate        1.000000             NaN            NaN   0.972245   
-    cons.price.idx           NaN             1.0            NaN        NaN   
-    cons.conf.idx            NaN             NaN            1.0        NaN   
-    euribor3m           0.972245             NaN            NaN   1.000000   
-    nr.employed         0.906970             NaN            NaN   0.945154   
-    y                        NaN             NaN            NaN        NaN   
-    
-                    nr.employed    y  
-    age                     NaN  NaN  
-    job                     NaN  NaN  
-    marital                 NaN  NaN  
-    education               NaN  NaN  
-    default                 NaN  NaN  
-    housing                 NaN  NaN  
-    loan                    NaN  NaN  
-    contact                 NaN  NaN  
-    month                   NaN  NaN  
-    day_of_week             NaN  NaN  
-    duration                NaN  NaN  
-    campaign                NaN  NaN  
-    pdays                   NaN  NaN  
-    previous                NaN  NaN  
-    poutcome                NaN  NaN  
-    emp.var.rate       0.906970  NaN  
-    cons.price.idx          NaN  NaN  
-    cons.conf.idx           NaN  NaN  
-    euribor3m          0.945154  NaN  
-    nr.employed        1.000000  NaN  
-    y                       NaN  1.0  
-    
-    [21 rows x 21 columns]
+  ![Distribution of Y](bank_marketing_analysis_files/bank_marketing_analysis_17_1.png){#fig-distributionY}
     
 
-### Analysis
+## Analysis
 
 The analysis began with loading and preprocessing the dataset, addressing missing values, encoding categorical features, and scaling numeric variables to ensure consistency across features. The dataset was then split into training and testing sets, with 20% allocated for testing to evaluate model performance. A logistic regression model was chosen for binary classification, implemented through a Pipeline to streamline preprocessing, encoding, and model fitting. To optimize model accuracy, GridSearchCV was used for hyperparameter tuning, and cross-validation was employed to assess the model's robustness. After training the model, its performance was evaluated using various metrics such as accuracy, precision, recall, and F1-score, with confusion matrices and heatmaps created using Seaborn for better visualization. These tools provided insights into the model's ability to differentiate between classes. 
 
@@ -635,6 +368,7 @@ To evaluate the utility of each predictor in predicting the response variable (y
 ```{python}
 #| echo: false   
 #| results: "hide"  
+#| output: hide
 ## visualization
 ```
 
@@ -642,6 +376,7 @@ To evaluate the utility of each predictor in predicting the response variable (y
 ```{python}
 #| echo: false   
 #| results: "hide"  
+#| output: hide
 # Assuming the Bank Marketing dataset is loaded into a DataFrame called `bank_data`
 aly.alt.data_transformers.enable('vegafusion')
 
@@ -653,7 +388,11 @@ aly.dist(bank_data, color='y')
 
 
 
-```python
+```{python}
+#| echo: false   
+#| results: "hide"  
+#| output: hide
+
 # Look at the univariate distributions (counts) for categorical variables
 # Changing 'target' to an object dtype just for the data passed to the chart
 aly.dist(
@@ -666,12 +405,20 @@ aly.dist(
 
 
 
-```python
+```{python}
+#| echo: false   
+#| results: "hide"  
+#| output: hide
+
 # Visualize pairwise correlations for quantitative variables
 aly.corr(bank_data)
 ```
 
-```python
+```{python}
+#| echo: false   
+#| results: "hide"  
+#| output: hide
+
 # Visualize pairwise scatterplots for quantitative variables with high correlations
 # Identify columns with at least one high correlation
 high_corr_columns = [
@@ -685,75 +432,6 @@ high_corr_columns = [
 # Sampling the DataFrame to not saturate the charts
 aly.pair(bank_data[high_corr_columns].sample(300), color='y')
 ```
-
-
-
-
-
-<style>
-  #altair-viz-36524cb35d06459983392ca067d28af4.vega-embed {
-    width: 100%;
-    display: flex;
-  }
-
-  #altair-viz-36524cb35d06459983392ca067d28af4.vega-embed details,
-  #altair-viz-36524cb35d06459983392ca067d28af4.vega-embed details summary {
-    position: relative;
-  }
-</style>
-<div id="altair-viz-36524cb35d06459983392ca067d28af4"></div>
-<script type="text/javascript">
-  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
-  (function(spec, embedOpt){
-    let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-36524cb35d06459983392ca067d28af4") {
-      outputDiv = document.getElementById("altair-viz-36524cb35d06459983392ca067d28af4");
-    }
-    const paths = {
-      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
-      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
-      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.20.1?noext",
-      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
-    };
-
-    function maybeLoadScript(lib, version) {
-      var key = `${lib.replace("-", "")}_version`;
-      return (VEGA_DEBUG[key] == version) ?
-        Promise.resolve(paths[lib]) :
-        new Promise(function(resolve, reject) {
-          var s = document.createElement('script');
-          document.getElementsByTagName("head")[0].appendChild(s);
-          s.async = true;
-          s.onload = () => {
-            VEGA_DEBUG[key] = version;
-            return resolve(paths[lib]);
-          };
-          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
-          s.src = paths[lib];
-        });
-    }
-
-    function showError(err) {
-      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
-      throw err;
-    }
-
-    function displayChart(vegaEmbed) {
-      vegaEmbed(outputDiv, spec, embedOpt)
-        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
-    }
-
-    if(typeof define === "function" && define.amd) {
-      requirejs.config({paths});
-      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
-    } else {
-      maybeLoadScript("vega", "5")
-        .then(() => maybeLoadScript("vega-lite", "5.20.1"))
-        .then(() => maybeLoadScript("vega-embed", "6"))
-        .catch(showError)
-        .then(() => displayChart(vegaEmbed));
-    }
-</script>
 
 
 
@@ -809,47 +487,19 @@ y_pred = pipeline.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 conf_matrix = confusion_matrix(y_test, y_pred)
 
-# Print evaluation metrics
-print("Accuracy:", accuracy)
-print("Confusion Matrix:\n", conf_matrix)
 
 # Additional evaluation metrics
 precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
 recall = recall_score(y_test, y_pred, pos_label='yes')
 f1 = f1_score(y_test, y_pred, pos_label='yes')
 
-# Print additional metrics
-print("Logistic Regression Evaluation:")
-print(f"Accuracy: {accuracy:.2f}")
-print(f"Precision: {precision:.2f}")
-print(f"Recall: {recall:.2f}")
-print(f"F1 Score: {f1:.2f}")
-
-# Plot confusion matrix heatmap
-plt.figure(figsize=(6, 5))
-sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['No', 'Yes'], yticklabels=['No', 'Yes'])
-plt.title('Confusion Matrix Heatmap')
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.show()
 
 
 ```
 
-    Accuracy: 0.8975479485311969
-    Confusion Matrix:
-     [[7198  105]
-     [ 739  196]]
-    Logistic Regression Evaluation:
-    Accuracy: 0.90
-    Precision: 0.65
-    Recall: 0.21
-    F1 Score: 0.32
-    
 
 
-    
-![png](bank_marketing_analysis_files/bank_marketing_analysis_30_1.png)
+![Confusion Matrix Heatmap 1 - without Hyperparameter optimization using grid search](bank_marketing_analysis_files/bank_marketing_analysis_30_1.png){#fig-heatmap1}
     
 
 
@@ -905,8 +555,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Fit the grid search to the data
 grid_search.fit(X_train, y_train)
 
-# Print the best parameters found by GridSearchCV
-print("Best hyperparameters found: ", grid_search.best_params_)
+
 
 # Make predictions with the best model
 y_pred = grid_search.predict(X_test)
@@ -915,48 +564,16 @@ y_pred = grid_search.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 conf_matrix = confusion_matrix(y_test, y_pred)
 
-# Print evaluation metrics
-print("Accuracy:", accuracy)
-print("Confusion Matrix:\n", conf_matrix)
-
-# Additional evaluation metrics
 # Additional evaluation metrics
 precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
 recall = recall_score(y_test, y_pred, pos_label='yes')
 f1 = f1_score(y_test, y_pred, pos_label='yes')
-# Print additional metrics
-print("Logistic Regression Evaluation:")
-print(f"Accuracy: {accuracy:.2f}")
-print(f"Precision: {precision:.2f}")
-print(f"Recall: {recall:.2f}")
-print(f"F1 Score: {f1:.2f}")
 
-
-# Plot confusion matrix heatmap
-plt.figure(figsize=(6, 5))
-sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['No', 'Yes'], yticklabels=['No', 'Yes'])
-plt.title('Confusion Matrix Heatmap')
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.show()
 
 ```
 
-    Best hyperparameters found:  {'classifier__C': 0.1, 'classifier__max_iter': 300, 'classifier__penalty': 'l1', 'classifier__solver': 'liblinear'}
-    Accuracy: 0.8852082650049197
-    Confusion Matrix:
-     [[5236   68]
-     [ 632  162]]
-    Logistic Regression Evaluation:
-    Accuracy: 0.89
-    Precision: 0.70
-    Recall: 0.20
-    F1 Score: 0.32
     
-
-
-    
-![png](bank_marketing_analysis_files/bank_marketing_analysis_31_1.png)
+![Confusion Matrix Heatmap 2 - Liner Regression Model](bank_marketing_analysis_files/bank_marketing_analysis_31_1.png){#fig-heatmap2}
     
 
 
@@ -1022,30 +639,13 @@ y_pred = best_model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 conf_matrix = confusion_matrix(y_test, y_pred)
 
-# Print evaluation metrics
-print("Best Parameters from Grid Search:", grid_search.best_params_)
-print("Accuracy:", accuracy)
-print("Confusion Matrix:\n", conf_matrix)
 
 # Additional evaluation metrics
 precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
 recall = recall_score(y_test, y_pred, pos_label='yes')
 f1 = f1_score(y_test, y_pred, pos_label='yes')
 
-# Print additional metrics
-print("Decision Tree Evaluation with Optimized Hyperparameters:")
-print(f"Accuracy: {accuracy:.2f}")
-print(f"Precision: {precision:.2f}")
-print(f"Recall: {recall:.2f}")
-print(f"F1 Score: {f1:.2f}")
 
-# Plot confusion matrix heatmap
-plt.figure(figsize=(6, 5))
-sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['No', 'Yes'], yticklabels=['No', 'Yes'])
-plt.title('Confusion Matrix Heatmap')
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.show()
 
 # Extract feature names after one-hot encoding
 ohe = best_model.named_steps['preprocessor'].transformers_[1][1]  # Get the OneHotEncoder
@@ -1057,22 +657,8 @@ feature_names = numeric_feats + list(ohe_columns)
 
 ```
 
-    Fitting 5 folds for each of 90 candidates, totalling 450 fits
-    Best Parameters from Grid Search: {'classifier__criterion': 'entropy', 'classifier__max_depth': 5, 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 2}
-    Accuracy: 0.8973051711580481
-    Confusion Matrix:
-     [[7177  126]
-     [ 720  215]]
-    Decision Tree Evaluation with Optimized Hyperparameters:
-    Accuracy: 0.90
-    Precision: 0.63
-    Recall: 0.23
-    F1 Score: 0.34
     
-
-
-    
-![Confusion Matrix Heat Map](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){#fig-confusion}
+![Confusion Matrix HeatMap 3 - Decision Tree Model](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){#fig-heatmap3}
     
 
 
@@ -1091,14 +677,6 @@ ohe_columns = ohe.get_feature_names_out(categorical_feats)
 # Combine the numeric and one-hot encoded feature names
 feature_names = numeric_feats + list(ohe_columns)
 
-# Set a higher DPI (dots per inch) for better quality and save the figure
-plt.figure(figsize=(20, 15))  # Increase the size for better visibility
-plot_tree(best_tree, filled=True, feature_names=feature_names, class_names=['no', 'yes'], rounded=True, max_depth=5)
-
-# Save the plot as a high-resolution image
-plt.title('Optimized Decision Tree Visualization (Limited Depth)')
-plt.savefig('decision_tree_high_res.png', dpi=300)  # Save with 300 dpi for high resolution
-plt.show()
 ```
 
 
@@ -1107,12 +685,18 @@ plt.show()
     
 
 
+
+
+
+\newpage
 # Discussion
 
 ## Logistic Regression Model:
 
-The Logistic Regression model has achieved an accuracy of approximately 88.5%, with the best hyperparameters found as: 
-`{'classifier__C': 0.1, 'classifier__max_iter': 100, 'classifier__penalty': 'l1', 'classifier__solver': 'liblinear'}`. The confusion matrix for this model is as follows:
+The Logistic Regression model has achieved an accuracy of approximately 88.5%, with the best hyperparameters found as: as follows
+`{'classifier__C': 0.1, 'classifier__max_iter': 100, 'classifier__penalty': 'l1', 'classifier__solver': 'liblinear'}`. 
+
+The confusion matrix for this model as shown in @fig-heatmap2:
 
 - **True Negatives (5236)**: The model correctly identified 5236 non-subscribers, which indicates its strong performance in predicting the majority class (non-subscribers).
 - **False Positives (68)**: There are 68 instances where the model incorrectly predicted that non-subscribers would subscribe. This is a relatively low number, indicating that the model is relatively efficient at avoiding unnecessary targeting.
@@ -1124,7 +708,9 @@ The **Precision** is 0.70, meaning that 70% of the customers predicted as subscr
 ## Decision Tree Model:
 
 After performing a grid search for hyperparameter optimization, the best hyperparameters found are: 
-`{'classifier__criterion': 'entropy', 'classifier__max_depth': 5, 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 2}`. The model achieved an accuracy of approximately 89.7%, with the confusion matrix as follows:
+`{'classifier__criterion': 'entropy', 'classifier__max_depth': 5, 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 2}`. 
+
+The model achieved an accuracy of approximately 89.7%, with the confusion matrix as shown in @fig-heatmap3
 
 - **True Negatives (7177)**: The Decision Tree correctly predicted 7177 non-subscribers, showing solid performance in predicting the majority class (non-subscribers).
 - **False Positives (126)**: There are 126 instances where the model incorrectly predicted non-subscribers as subscribers, which is a moderate number compared to the Logistic Regression model, indicating a higher sensitivity to identifying potential subscribers.
