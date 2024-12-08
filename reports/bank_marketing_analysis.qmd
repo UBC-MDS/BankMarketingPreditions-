@@ -59,21 +59,18 @@ This research raises the question of whether a machine learning algorithm can pr
 
 ## Data
 
-The dataset used in this project is the Bank Marketing dataset, sourced from the UCI Machine Learning Repository [@bank_marketing_222]. It contains information related to direct marketing campaigns (via phone calls) conducted by a Portuguese banking institution to predict if a client will subscribe to a term deposit. The dataset contains 45,211 rows and 17 columns and it includes features such as age, job type, marital status, education, balance, and details about previous marketing campaigns. The target variable in this study is "y," which indicates whether a customer subscribed to a term deposit (binary: "yes" or "no"). We processed and analyzed this data using Python with libraries such as pandas, scikit-learn, and matplotlib to implement data cleaning, exploratory data analysis, and machine learning models. The data has been pre-processed and contains no missing values.
-
-
 ```{python}
-#| echo: false
+#| echo: false  
 #| results: hide
 
 #download and extract data from csv
-bank_data = pd.read_csv("../data/bank-additional-full.csv", sep = ";")
-bank_data
-
-# Check if 'unknown' is still present in any column
-unknown_counts = bank_data.isin(['unknown']).sum()
+bank_data = pd.read_csv("../data/bank-additional-full.csv", sep=";")
 
 ```
+
+The dataset used in this project is the Bank Marketing dataset, sourced from the UCI Machine Learning Repository [@bank_marketing_222]. It contains information related to direct marketing campaigns (via phone calls) conducted by a Portuguese banking institution to predict if a client will subscribe to a term deposit. The dataset contains 45,211 rows and 17 columns and it includes features such as age, job type, marital status, education, balance, and details about previous marketing campaigns. The target variable in this study is "y," which indicates whether a customer subscribed to a term deposit (binary: "yes" or "no"). We processed and analyzed this data using Python with libraries such as pandas, scikit-learn, and matplotlib to implement data cleaning, exploratory data analysis, and machine learning models. The data has been pre-processed and contains no missing values.
+
+
 \newpage
 ```{python}
 #| echo: false   
@@ -357,256 +354,16 @@ To evaluate the utility of each predictor in predicting the response variable (y
 
 
 ## Model Creation
-### Initially without Hyperparameter optimization using grid search
 
-
-```{python}
-
-#| echo: false   
-#| results: "hide"  
-
-# Set a seed for reproducibility
-np.random.seed(42)
-
-# Assuming bank_data is already loaded
-unknown_columns = bank_data.columns[bank_data.isin(['unknown']).any()]
-
-# Clean the data by replacing 'unknown' values with a placeholder (e.g., 'other')
-cleaned_data = bank_data.apply(lambda col: col.replace('unknown', 'other') if col.dtypes == 'object' else col)
-
-# Define feature subsets
-numeric_feats = ['age', 'emp.var.rate', 'cons.price.idx', 'cons.conf.idx', 'euribor3m', 'nr.employed', 'campaign']
-categorical_feats = ['job', 'education', 'default', 'housing', 'loan', 'contact', 'poutcome']
-drop_feats = ['duration', 'month', 'day_of_week', 'pdays', 'marital', 'previous']
-
-# Separate features and target variable
-X = cleaned_data.drop(columns=drop_feats + ['y'])  # Features excluding target 'y' and drop_feats
-y = cleaned_data['y']  # Target variable
-
-# Create the column transformer to apply preprocessing
-ct = make_column_transformer(
-    (StandardScaler(), numeric_feats),  # Standard scaling for numeric features
-    (OneHotEncoder(drop="if_binary", sparse_output=False), categorical_feats)  # One-hot encoding for categorical features
-)
-
-# Create a pipeline with preprocessing and logistic regression model
-pipeline = Pipeline(steps=[
-    ('preprocessor', ct),
-    ('classifier', LogisticRegression(solver='liblinear'))  # Using 'liblinear' solver for small datasets
-])
-
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
-pipeline.fit(X_train, y_train)
-
-# Make predictions
-y_pred = pipeline.predict(X_test)
-
-# Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-conf_matrix = confusion_matrix(y_test, y_pred)
-
-
-# Additional evaluation metrics
-precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
-recall = recall_score(y_test, y_pred, pos_label='yes')
-f1 = f1_score(y_test, y_pred, pos_label='yes')
-
-
-
-```
-
-
-
-![Confusion Matrix Heatmap 1 - without Hyperparameter optimization using grid search](bank_marketing_analysis_files/bank_marketing_analysis_30_1.png){#fig-heatmap1}
+![Confusion Matrix Heatmap - Liner Regression Model](bank_marketing_analysis_files/bank_marketing_analysis_31_1.png){#fig-heatmap2}
+    
+    
+![Confusion Matrix HeatMap - Decision Tree Model](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){#fig-heatmap3}
     
 
 
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-
-# Set a seed for reproducibility
-np.random.seed(42)
-
-# Assuming bank_data is already loaded
-unknown_columns = bank_data.columns[bank_data.isin(['unknown']).any()]
-
-# Clean the data by removing rows with 'unknown' values
-cleaned_data = bank_data[~bank_data.isin(['unknown']).any(axis=1)]
-
-# Define feature subsets
-numeric_feats = ['age', 'emp.var.rate', 'cons.price.idx', 'cons.conf.idx', 'euribor3m', 'nr.employed', 'campaign']
-categorical_feats = ['job', 'education', 'default', 'housing', 'loan', 'contact', 'poutcome']
-drop_feats = ['duration', 'month', 'day_of_week', 'pdays', 'marital', 'previous']
-
-# Separate features and target variable
-X = cleaned_data.drop(columns=drop_feats + ['y'])  # Features excluding target 'y' and drop_feats
-y = cleaned_data['y']  # Target variable
-
-# Create the column transformer to apply preprocessing
-ct = make_column_transformer(
-    (StandardScaler(), numeric_feats),  # Standard scaling for numeric features
-    (OneHotEncoder(drop="if_binary", sparse_output=False), categorical_feats)  # One-hot encoding for categorical features
-)
-
-# Create a pipeline with preprocessing and logistic regression model
-pipeline = Pipeline(steps=[
-    ('preprocessor', ct),
-    ('classifier', LogisticRegression(solver='liblinear'))  # Using 'liblinear' solver for small datasets
-])
-
-# Define the hyperparameter grid
-param_grid = {
-    'classifier__C': [0.01, 0.1, 1, 10, 100],  # Regularization strength
-    'classifier__penalty': ['l1', 'l2'],  # Regularization type
-    'classifier__solver': ['liblinear'],  # Solver for logistic regression
-    'classifier__max_iter': [100, 200, 300]  # Maximum number of iterations for convergence
-}
-
-# Create GridSearchCV with cross-validation
-grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
-
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Fit the grid search to the data
-grid_search.fit(X_train, y_train)
-
-
-
-# Make predictions with the best model
-y_pred = grid_search.predict(X_test)
-
-# Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-conf_matrix = confusion_matrix(y_test, y_pred)
-
-# Additional evaluation metrics
-precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
-recall = recall_score(y_test, y_pred, pos_label='yes')
-f1 = f1_score(y_test, y_pred, pos_label='yes')
-
-
-```
-
-    
-![Confusion Matrix Heatmap 2 - Liner Regression Model](bank_marketing_analysis_files/bank_marketing_analysis_31_1.png){#fig-heatmap2}
-    
-
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-
-# Set a seed for reproducibility
-np.random.seed(42)
-
-# Assuming bank_data is already loaded
-unknown_columns = bank_data.columns[bank_data.isin(['unknown']).any()]
-
-# Clean the data by replacing 'unknown' values with a placeholder (e.g., 'other')
-cleaned_data = bank_data.apply(lambda col: col.replace('unknown', 'other') if col.dtypes == 'object' else col)
-
-# Define feature subsets
-numeric_feats = ['age', 'emp.var.rate', 'cons.price.idx', 'cons.conf.idx', 'euribor3m', 'nr.employed', 'campaign']
-categorical_feats = ['job', 'education', 'default', 'housing', 'loan', 'contact', 'poutcome']
-drop_feats = ['duration', 'month', 'day_of_week', 'pdays', 'marital', 'previous']
-
-# Separate features and target variable
-X = cleaned_data.drop(columns=drop_feats + ['y'])  # Features excluding target 'y' and drop_feats
-y = cleaned_data['y']  # Target variable
-
-# Create the column transformer to apply preprocessing
-ct = make_column_transformer(
-    (StandardScaler(), numeric_feats),  # Standard scaling for numeric features
-    (OneHotEncoder(drop="if_binary", sparse_output=False), categorical_feats)  # One-hot encoding for categorical features
-)
-
-# Create a pipeline with preprocessing and decision tree classifier
-pipeline = Pipeline(steps=[
-    ('preprocessor', ct),
-    ('classifier', DecisionTreeClassifier(random_state=42))  # Decision tree model
-])
-
-# Define parameter grid for grid search
-param_grid = {
-    'classifier__max_depth': [3, 5, 7, 10, None],  # Maximum depth of tree
-    'classifier__min_samples_split': [2, 5, 10],  # Minimum samples to split a node
-    'classifier__min_samples_leaf': [1, 2, 5],  # Minimum samples required to be a leaf node
-    'classifier__criterion': ['gini', 'entropy']  # Criterion for splitting nodes
-}
-
-# Create a GridSearchCV object
-grid_search = GridSearchCV(pipeline, param_grid, cv=5, n_jobs=-1, verbose=1)
-
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Fit the grid search to the data
-grid_search.fit(X_train, y_train)
-
-# Best model from grid search
-best_model = grid_search.best_estimator_
-
-# Make predictions using the best model
-y_pred = best_model.predict(X_test)
-
-# Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-conf_matrix = confusion_matrix(y_test, y_pred)
-
-
-# Additional evaluation metrics
-precision = precision_score(y_test, y_pred, pos_label='yes')  # Specify pos_label
-recall = recall_score(y_test, y_pred, pos_label='yes')
-f1 = f1_score(y_test, y_pred, pos_label='yes')
-
-
-
-# Extract feature names after one-hot encoding
-ohe = best_model.named_steps['preprocessor'].transformers_[1][1]  # Get the OneHotEncoder
-ohe_columns = ohe.get_feature_names_out(categorical_feats)
-
-# Combine numeric and categorical features
-feature_names = numeric_feats + list(ohe_columns)
-
-
-```
-
-    
-![Confusion Matrix HeatMap 3 - Decision Tree Model](bank_marketing_analysis_files/bank_marketing_analysis_32_1.png){#fig-heatmap3}
-    
-
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-
-# Get the decision tree model after optimization
-best_tree = best_model.named_steps['classifier']
-
-# Get the feature names after one-hot encoding
-ohe = best_model.named_steps['preprocessor'].transformers_[1][1]  # Get the OneHotEncoder
-ohe_columns = ohe.get_feature_names_out(categorical_feats)
-
-# Combine the numeric and one-hot encoded feature names
-feature_names = numeric_feats + list(ohe_columns)
-
-```
-
-
-    
 ![Optimized Decision Tree Visualization](bank_marketing_analysis_files/bank_marketing_analysis_33_0.png){#fig-decision-tree}
     
-
-
-
 
 
 \newpage
