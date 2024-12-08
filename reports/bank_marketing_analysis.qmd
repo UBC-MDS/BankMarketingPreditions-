@@ -37,17 +37,7 @@ from scipy.stats import pointbiserialr, chi2_contingency
 from pandera import Column, DataFrameSchema, Check
 from pandera.errors import SchemaErrors
 from IPython.display import Markdown
-from IPython.display import display, HTML
 
-# Adjust the CSS for output display
-display(HTML("""
-<style>
-.output_area pre {
-    white-space: pre-wrap; /* Enable word wrapping for long lines */
-    word-wrap: break-word; /* Ensure lines break properly */
-}
-</style>
-"""))
 
 ```
 
@@ -84,7 +74,7 @@ bank_data
 unknown_counts = bank_data.isin(['unknown']).sum()
 
 ```
-
+\newpage
 ```{python}
 #| echo: false   
 
@@ -363,75 +353,6 @@ The analysis began with loading and preprocessing the dataset, addressing missin
 # Results
 
 To evaluate the utility of each predictor in predicting the response variable (y) for the bank marketing dataset, we visualized the distributions of each predictor in the training dataset, coloring them by the class (yes: orange and no: blue). These visualizations include univariate distributions, pairwise correlations, and scatterplots, as seen in the attached figures. In analyzing these plots, we observe significant differences in the distribution centers and spreads of predictors like duration and campaign between the two classes. However, some variables, such as age and balance, show overlapping distributions with less apparent class separation. Furthermore, categorical predictors, such as job and month, exhibit class imbalance but may still hold valuable predictive information. Based on these insights, predictors demonstrating clear separability and meaningful patterns are prioritized for inclusion in the predictive model, while those showing little to no differentiation may be considered for exclusion.
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-#| output: hide
-## visualization
-```
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-#| output: hide
-# Assuming the Bank Marketing dataset is loaded into a DataFrame called `bank_data`
-aly.alt.data_transformers.enable('vegafusion')
-
-# Look at the univariate distributions for quantitative variables
-aly.dist(bank_data, color='y')
-
-```
-
-
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-#| output: hide
-
-# Look at the univariate distributions (counts) for categorical variables
-# Changing 'target' to an object dtype just for the data passed to the chart
-aly.dist(
-    bank_data.assign(target=lambda bank_data: bank_data['y'].astype(object)),
-    dtype='object',
-    color='y'
-)
-```
-
-
-
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-#| output: hide
-
-# Visualize pairwise correlations for quantitative variables
-aly.corr(bank_data)
-```
-
-```{python}
-#| echo: false   
-#| results: "hide"  
-#| output: hide
-
-# Visualize pairwise scatterplots for quantitative variables with high correlations
-# Identify columns with at least one high correlation
-high_corr_columns = [
-    "age",
-    "duration",
-    "campaign",
-    "previous",
-    "y",  # Always include the target as well
-]
-
-# Sampling the DataFrame to not saturate the charts
-aly.pair(bank_data[high_corr_columns].sample(300), color='y')
-```
 
 
 
