@@ -1,10 +1,16 @@
+version: '3.8'
+
 services:
   jupyter-lab:
-    image: fazeeia/dsci522-dockerfile-bank
+    image: fazeeia/dsci522-dockerfile-bank:latest
     ports:
-    - "8888:8888"
+      - "8888:8888"
     volumes:
-    - .:/home/jovyan
+      - .:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    stdin_open: true
+    tty: true
     deploy:
       resources:
         limits:
