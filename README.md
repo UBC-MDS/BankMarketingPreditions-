@@ -34,22 +34,13 @@ Navigate to the project directory
 cd BankMarketingPreditions-
 
 
-3. **Pull the Docker Image**
+3. **Run the Docker Container Using Docker Compose**
 
 Run the following command in your terminal to pull the project’s Docker image:
 
-docker pull fazeeia/dsci522-dockerfile-bank:latest
+docker-compose up
 
-4. **Run the Docker Container**
-
-Run the following command in your terminal to start the Docker container and mount your local directory:
-
-docker run -p 8888:8888 -it -v /$(pwd):/home/jovyan/work fazeeia/dsci522-d
-
--p 8888:8888: This maps port 8888 inside the container to port 8888 on your local machine (where JupyterLab will be running).
--v $(pwd):/home/jovyan/work: This mounts your current working directory to the container’s working directory, allowing you to access your project files inside the container.
-
-5. **Access JupyterLab**
+4. **Access JupyterLab**
 
 You will see a URL in the terminal. Open the link in your browser to access the JupyterLab environment. 
 
@@ -101,6 +92,7 @@ The final report is available as a PDF. You can view the completed analysis by o
 
 
 ## Running Project scripts
+
 1. Change your directory to the current project directory using the cd command from bash.
 
 2. Scripts are run using the click command in the root of the project. More details about the scripts can be found in the scr directory.
@@ -113,7 +105,7 @@ The final report is available as a PDF. You can view the completed analysis by o
         python 03_explory_analysis.py --cleaned_data_path data/cleaned_bank_data.csv --output_prefix results/eda
 
         python 04_model_LR.py --input_path ./cleaned_data.csv --model_output_path ./model/logistic_regression_model.pkl --confusion_matrix_output .results/eda/confusion_matrixLR.png
-        
+
         python 04_model_DT.py --input_path ./cleaned_data.csv --model_output_path ./model/decision_tree_model.pkl --confusion_matrix_output .results/eda/confusion_matrixDT.png
 
        
@@ -124,15 +116,25 @@ Docker is a container solution used to manage the software dependencies for this
 
 To run the analysis and work with the code, you will need to install the following Python packages. These are automatically included in the environment.yml file, but here is the full list for reference:
 
-altair
-numpy
-pandas
-scikit-learn (includes tools like train_test_split, GridSearchCV, StandardScaler, OneHotEncoder, KNeighborsClassifier, LogisticRegression, DecisionTreeClassifier, etc.)
-matplotlib
-seaborn
-ucimlrepo
-altair_ally
-click 
+- **Python 3.10**
+- **matplotlib==3.9.2**
+- **numpy==1.23.5** (Compatible with scikit-learn and scipy)
+- **pandas==1.5.3** (Stable version of pandas)
+- **scikit-learn==1.2.2** (Includes tools like `train_test_split`, `GridSearchCV`, `StandardScaler`, `OneHotEncoder`, `KNeighborsClassifier`, `LogisticRegression`, `DecisionTreeClassifier`, etc.)
+- **seaborn==0.13.2**
+- **altair==5.1.0**
+- **scipy==1.10.1** (Compatible with numpy 1.23.x)
+- **ipython==8.12.0**
+- **nbformat==5.9.2**
+- **jupyter==1.0.0**
+- **jupyterlab==4.0.5**
+- **quarto==1.3.433**
+- **pip==24.0**
+- **altair-ally==0.1.1** (Installed via pip)
+- **pandera==0.8.1** (Installed via pip)
+- **tabulate** (Installed via pip)
+- **ucimlrepo**
+- **click**
 
 These dependencies are necessary for data processing, model building, evaluation, and visualization.
 
