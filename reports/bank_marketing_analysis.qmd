@@ -255,17 +255,25 @@ except pa.errors.SchemaError as e:
 
 #| echo: false   
 #  Target/Response Variable Follows Expected Distribution 
-# Define the schema for validating the target column 'y'
+
+## Define the schema for validating the target column 'y'
 target_schema = pa.DataFrameSchema({
-    "y": pa.Column(str, pa.Check.isin(['yes', 'no'], error="Target must be 'yes' or 'no'"), nullable=False)
+    "y": pa.Column(str, nullable=False)
 })
 
 # Validate the DataFrame
 try:
     validated_target = target_schema.validate(bank_data)
+
+    # Apply the Check after schema validation
+    if not bank_data['y'].isin(['yes', 'no']).all():
+        raise ValueError("Target must be 'yes' or 'no'")
+
     print("Target validation passed.")
 except pa.errors.SchemaError as e:
     print("Target validation failed:\n", e.failure_cases)
+except ValueError as e:
+    print(e)
 
 ```
 
