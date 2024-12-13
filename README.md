@@ -53,8 +53,33 @@ docker run -p 8888:8888 -it -v /$(pwd):/home/jovyan/work fazeeia/dsci522-d
 
 You will see a URL in the terminal. Open the link in your browser to access the JupyterLab environment. 
 
+### Option 2: Run Using the Make file ###
 
-### Option 2: Run Locally
+1. **Clone the repository**
+
+git clone https://github.com/mindy001/Group37DSCI522.git
+
+Navigate to the project directory
+
+cd BankMarketingPreditions-
+
+2. **Set up the environment**
+
+conda env create -f env/environment.yml
+conda activate bankenv
+
+3. **Run the Report**
+
+To generate the report, run the following command in your terminal:
+
+make all
+
+4. **Open the Report**
+
+The final report is available as a PDF. You can view the completed analysis by opening the bank_marketing_analysis.pdf file.
+
+
+### Option 3: Run Locally
 
 1. **Clone the repository**
 
@@ -72,14 +97,23 @@ After activating the environment, you can run the analysis script or Jupyter not
 4. **Open the Report**
 
 The final report is available as a PDF. You can view the completed analysis by opening the bank_marketing_analysis.pdf file.
+
+
+
 ## Running Project scripts
 1. Change your directory to the current project directory using the cd command from bash.
+
 2. Scripts are run using the click command in the root of the project. More details about the scripts can be found in the scr directory.
+
 3. These are command lines to run  the python files:
         python 01_download.py --directory data/bankmarketing/bank-additional/bank-additional/ --filename bank-additional-full.csv
+
         python 02_clean_data.py --input_path data/bankmarketing/bank-additional/bank-additional/bank-additional-full.csv --output_path data/cleaned_bank_data.csv
+
         python 03_explory_analysis.py --cleaned_data_path data/cleaned_bank_data.csv --output_prefix results/eda
+
         python 04_model_LR.py --input_path ./cleaned_data.csv --model_output_path ./model/logistic_regression_model.pkl --confusion_matrix_output .results/eda/confusion_matrixLR.png
+        
         python 04_model_DT.py --input_path ./cleaned_data.csv --model_output_path ./model/decision_tree_model.pkl --confusion_matrix_output .results/eda/confusion_matrixDT.png
 
        
