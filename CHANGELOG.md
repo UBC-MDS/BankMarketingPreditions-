@@ -18,11 +18,11 @@
    1. The path to the environment creation file is incorrect.
    2. The `conda env create` and `conda activate` commands are written on the same line, which is confusing. I recommend separating them.
    3. Step 3, which refers to running the `.ipynb` file, is no longer applicable and should be removed.
-   - **Fix**: The Docker Compose file was updated to address these issues.
+   - **Fix**: The Docker Compose file was updated to address these issues. As previously mentioned a git ignore was created. And the environment was updated. 
 
 ### 5. There is no mention of third-party software used in the analysis (e.g., Python, Pandas) in the report.
    - **URL**: [GitHub - References.bib](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/reports/references.bib)
-   - **Fix**: The references were updated to include third-party software.
+   - **Fix**: The references were updated to include third-party software references
 
 ### 6. The report file [bank_marketing_analysis.qmd](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/reports/bank_marketing_analysis.qmd) contains hardcoded values (e.g., report numbers), which prevent the code from being reproducible if rerun. For example, the following screen captures show the Discussion sections with hardcoded results.
    - **Fix**: Refactoring of the code is currently in progress to make it more reproducible.
