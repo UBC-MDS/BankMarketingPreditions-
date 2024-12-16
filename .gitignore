@@ -5,7 +5,7 @@
 Thumbs.db
 # Docker files
 docker-compose.override.yml
-
+.DS_Store
 # Build artifacts
 **/build/
 
