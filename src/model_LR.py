@@ -135,35 +135,35 @@ def train_model(input_path, model_output_path, confusion_matrix_output):
     Main function to train the model, evaluate, and save the results.
     """
     try:
-        # Step 1: Load and clean data
+        
         cleaned_data = load_and_clean_data(input_path)
         
-        # Step 2: Prepare features and target
+       
         X, y = prepare_features_and_target(cleaned_data)
         
-        # Step 3: Create column transformer
+        
         ct = create_column_transformer()
         
-        # Step 4: Create pipeline
+        
         pipeline = create_pipeline(ct)
         
-        # Step 5: Split data into train and test sets
+        
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         print(f"Training data size: {X_train.shape}, Test data size: {X_test.shape}")
         
-        # Step 6: Perform grid search
+        
         grid_search = perform_grid_search(pipeline, X_train, y_train)
         print("Best hyperparameters found: ", grid_search.best_params_)
         
-        # Step 7: Evaluate model
+       
         y_pred = grid_search.predict(X_test)
         evaluate_model(y_test, y_pred)
         
-        # Step 8: Plot confusion matrix
+       
         conf_matrix = confusion_matrix(y_test, y_pred)
         plot_confusion_matrix(conf_matrix, confusion_matrix_output)
         
-        # Step 9: Save the model
+       
         save_model(grid_search.best_estimator_, model_output_path)
     
     except Exception as e:

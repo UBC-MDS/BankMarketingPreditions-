@@ -22,3 +22,4 @@ def clean_data(input_path, output_path):
     df = df.drop_duplicates()
 
     df.to_csv(output_path, index=False)
+if __name__ == "__main__":

@@ -42,3 +42,5 @@ def train_logistic_model(X, y, model_output_path, cv=5):
         pickle.dump(grid.best_estimator_, f)
 
     return grid.best_estimator_
+
+if __name__ == "__main__":

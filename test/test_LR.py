@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -15,53 +15,40 @@ from model_LR import (load_and_clean_data, prepare_features_and_target,
                          create_column_transformer, create_pipeline,
                          evaluate_model, plot_confusion_matrix, save_model)
 
-
-@pytest.fixture
-def sample_data():
-    """Fixture to create sample data for testing."""
+def test_load_and_clean_data():
+    """Test the load_and_clean_data function."""
+    # Mock data creation
     X, y = make_classification(n_samples=100, n_features=5, random_state=42)
     data = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 6)])
     data['y'] = y
-    return data
-
-
-@pytest.fixture
-def mock_csv_file(tmp_path, sample_data):
-    """Fixture to mock a CSV file."""
-    file_path = tmp_path / "sample_data.csv"
-    sample_data.to_csv(file_path, index=False)
-    return file_path
-
-
-@pytest.fixture
-def model_output_path(tmp_path):
-    """Fixture for model output path."""
-    return tmp_path / "model.pkl"
-
-
-@pytest.fixture
-def confusion_matrix_output(tmp_path):
-    """Fixture for confusion matrix output path."""
-    return tmp_path / "confusion_matrix.html"
-
-
-def test_load_and_clean_data(mock_csv_file):
-    """Test the load_and_clean_data function."""
-    cleaned_data = load_and_clean_data(mock_csv_file)
+    
+    # Write to a mock CSV file
+    file_path = 'sample_data.csv'
+    data.to_csv(file_path, index=False)
+    
+    # Test load_and_clean_data function
+    cleaned_data = load_and_clean_data(file_path)
     assert isinstance(cleaned_data, pd.DataFrame)
     assert 'y' in cleaned_data.columns  
 
-
+    os.remove(file_path)  # Clean up after the test
+    
     with pytest.raises(FileNotFoundError):
         load_and_clean_data("non_existent_file.csv")
 
 
-def test_prepare_features_and_target(sample_data):
+def test_prepare_features_and_target():
     """Test the prepare_features_and_target function."""
-    X, y = prepare_features_and_target(sample_data)
-    assert X.shape[0] == sample_data.shape[0]  
-    assert y.shape[0] == sample_data.shape[0]  
-    assert 'y' not in X.columns 
+    # Create mock data
+    X, y = make_classification(n_samples=100, n_features=5, random_state=42)
+    data = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 6)])
+    data['y'] = y
+
+    X_prepared, y_prepared = prepare_features_and_target(data)
+    
+    assert X_prepared.shape[0] == data.shape[0]  
+    assert y_prepared.shape[0] == data.shape[0]  
+    assert 'y' not in X_prepared.columns 
 
 
 def test_create_column_transformer():
@@ -82,7 +69,6 @@ def test_create_pipeline():
 
 def test_evaluate_model():
     """Test the evaluate_model function."""
- 
     y_true = [1, 0, 1, 1, 0]
     y_pred = [1, 0, 1, 0, 0]
 
@@ -111,11 +97,13 @@ def test_plot_confusion_matrix():
         mock_save.assert_called_once()  
 
 
-def test_save_model(model_output_path):
+def test_save_model():
     """Test the save_model function."""
     # Create a dummy model
     model = LogisticRegression(solver='liblinear')
     model.fit([[1, 2, 3]], [1]) 
+    
+    model_output_path = 'model.pkl'
     
     with patch('builtins.open', mock_open()) as mock_file:
         save_model(model, model_output_path)
@@ -124,16 +112,31 @@ def test_save_model(model_output_path):
 
 
 @patch('your_script.train_model') 
-def test_train_model(mock_train_model, mock_csv_file, model_output_path, confusion_matrix_output):
+def test_train_model(mock_train_model):
     """Test the whole training flow."""
+    # Prepare mock data
+    X, y = make_classification(n_samples=100, n_features=5, random_state=42)
+    data = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 6)])
+    data['y'] = y
     
+   
+    mock_csv_file = 'sample_data.csv'
+    data.to_csv(mock_csv_file, index=False)
+    
+    model_output_path = 'model.pkl'
+    confusion_matrix_output = 'confusion_matrix.html'
+
+
     mock_train_model(input_path=mock_csv_file,
                      model_output_path=model_output_path,
                      confusion_matrix_output=confusion_matrix_output)
     
-  
     assert os.path.exists(model_output_path)
-    
-    
     assert os.path.exists(confusion_matrix_output)
+
+
+    os.remove(mock_csv_file)
+    os.remove(model_output_path)
+    os.remove(confusion_matrix_output)
+
 

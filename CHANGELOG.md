@@ -1,13 +1,35 @@
 
+# Commonly Highlighted Issues
 
-# Commonly highlighted issues:
-1. The pycache and .virtual_documents/reports are not properly named or .gitignore them.The data folder is getting the unnecessary folder, such as .ipynb_checkpoints folder.
-2. The code chunks in the READme.md are normal texts so they are hard to distinguish from normal text. The paragraphs arent well indented. The local run instruction is not so clear. it just says "After activating the environment, you can run the analysis script or Jupyter notebook called bank_marketing_analysis.ipynb" which is ambigious.
-3. The function documentation does not suffice. It doesn't have the meaning of parameters passed in. There is no main() function for some of the scripts
-4. Reproducibility: I wasn't able to run the docker container with the instructions provided (see error message below):Few minor fixes I've identified, when I tried to run the analysis locally: (1) in creating the environment step, a wrong path to the file is specified. (2) In addition, conda env create and conda activate commands are written on the same line, which can be confusing, so I would recommend separating them out. (3) step 3 about running .ipynb file is no longer applicable, and can be removed (4) command lines for running scripts don't work, I think wrong paths were specified to the script files
-5. There is no contribution to the third party software that being used in the analysis, such as python, pandas, etc. in the report.
-6. https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/reports/bank_marketing_analysis.qmd The file indicated that report with the number hardcode, which is not reproducible if the code rerun. For example, the following screen captures shown the Discussion sections with all hardcode results.
+### 1. `.pycache` and `.virtual_documents/reports` are not properly named or ignored in `.gitignore`. 
+   The `data` folder is receiving unnecessary folders, such as the `.ipynb_checkpoints` folder.
+   - **URL**: [GitHub - .gitignore](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/.gitignore)
+   - **Fix**: A `.gitignore` template was used, and additional files were added based on the project requirements.
 
-# Fixes for Highlighted issues
+### 2. Code chunks in the `README.md` are presented as normal text, making them hard to distinguish from regular text. Additionally, the paragraphs are not well indented. The local run instructions are unclear — for example, the line "After activating the environment, you can run the analysis script or Jupyter notebook called `bank_marketing_analysis.ipynb`" is ambiguous.
+   - **URL**: [GitHub - README.md](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/README.md)
+   - **Fix**: Indentation and paragraphing were improved for better clarity.
 
-1. Git ignore created. 
+### 3. Function documentation is insufficient. It lacks descriptions for the parameters being passed, and some scripts do not have a `main()` function.
+   - **URL**: [GitHub - Source Code](https://github.com/UBC-MDS/BankMarketingPreditions-/tree/main/src)
+   - **Fix**: A `main()` function was added to all scripts, and the documentation for the models was updated to include parameter descriptions.
+
+### 4. Reproducibility issue: I was unable to run the Docker container using the provided instructions (see error message below). A few minor fixes identified during the local run: 
+   1. The path to the environment creation file is incorrect.
+   2. The `conda env create` and `conda activate` commands are written on the same line, which is confusing. I recommend separating them.
+   3. Step 3, which refers to running the `.ipynb` file, is no longer applicable and should be removed.
+   - **Fix**: The Docker Compose file was updated to address these issues.
+
+### 5. There is no mention of third-party software used in the analysis (e.g., Python, Pandas) in the report.
+   - **URL**: [GitHub - References.bib](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/reports/references.bib)
+   - **Fix**: The references were updated to include third-party software.
+
+### 6. The report file [bank_marketing_analysis.qmd](https://github.com/UBC-MDS/BankMarketingPreditions-/blob/main/reports/bank_marketing_analysis.qmd) contains hardcoded values (e.g., report numbers), which prevent the code from being reproducible if rerun. For example, the following screen captures show the Discussion sections with hardcoded results.
+   - **Fix**: Refactoring of the code is currently in progress to make it more reproducible.
+
+### 7. General
+   - **Fix**:Tests: Are there automated tests or manual steps described so that the function of the software can be verified? Are they of sufficient quality to ensure software robsutness?
+   #### Tests were written : https://github.com/UBC-MDS/BankMarketingPreditions-/tree/main/test
+   #### Data : https://github.com/UBC-MDS/BankMarketingPreditions-/tree/main/data
+   Data was made accessible as part of the repository.
+Chat gpt was used to modify the markdown code. 

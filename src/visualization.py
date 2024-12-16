@@ -21,3 +21,4 @@ def generate_scatter_plot(df, x_col, y_col, output_path):
     ).properties(title=f"Scatterplot of {x_col} vs {y_col}")
 
     chart.save(output_path)
+if __name__ == "__main__":
