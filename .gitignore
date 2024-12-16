@@ -1,0 +1,50 @@
+.DS_Store
+.github/workflows
+.virtual_documents/reports
+.ipynb_checkpoints
+Thumbs.db
+# Docker files
+docker-compose.override.yml
+
+# Build artifacts
+**/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.bak
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python egg and package files
+*.egg
+*.egg-info/
+dist/
+build/
+.ipython
+.ipynb_checkpoints
+.config
+__pycache__
+.virtual_documents
