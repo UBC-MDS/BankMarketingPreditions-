@@ -32,8 +32,6 @@ def test_save_model():
 
 
 
-    os.remove(mock_csv_file)
     os.remove(model_output_path)
-    os.remove(confusion_matrix_output)
 
 
