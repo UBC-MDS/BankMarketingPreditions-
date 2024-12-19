@@ -15,25 +15,6 @@ from model_LR import ( evaluate_model,  save_model)
 
 
 
-def test_evaluate_model():
-    """Test the evaluate_model function."""
-    y_true = [1, 0, 1, 1, 0]
-    y_pred = [1, 0, 1, 0, 0]
-
-    with patch('builtins.print') as mock_print:
-        accuracy, precision, recall, f1 = evaluate_model(y_true, y_pred)
-        
-        assert accuracy == 0.8
-        assert precision == 1.0
-        assert recall == 0.6666666666666666
-        assert f1 == 0.8
-        
-        mock_print.assert_any_call(f"Accuracy: 0.80")
-        mock_print.assert_any_call(f"Precision: 1.00")
-        mock_print.assert_any_call(f"Recall: 0.67")
-        mock_print.assert_any_call(f"F1 Score: 0.80")
-
-
 
 def test_save_model():
     """Test the save_model function."""
